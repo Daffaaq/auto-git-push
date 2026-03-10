@@ -169,7 +169,7 @@ def git_tools_menu():
             print("⚠️ Pilihan tidak valid")
 
 # ======================
-# Commit & Push
+# Commit & Push TEST
 # ======================
 def commit_push_loop(branch):
     while True:
