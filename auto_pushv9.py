@@ -162,7 +162,7 @@ def git_tools_menu():
             print(f"✅ Pull Request dibuat dari '{current_branch}' ke 'main'")
 
             # Merge PR langsung
-            cmd_merge_pr = ["gh", "pr", "merge", current_branch, "--merge", "--delete-branch"]
+            cmd_merge_pr = ["gh", "pr", "merge", current_branch]
             run(cmd_merge_pr)
             print(f"🎉 Branch '{current_branch}' berhasil di-merge ke main dan dihapus di remote")
         else:
