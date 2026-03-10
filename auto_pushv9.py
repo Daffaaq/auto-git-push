@@ -145,13 +145,26 @@ def git_tools_menu():
             run(cmd)
             print(f"✅ Pull Request dibuat dari '{current_branch}' ke '{target_branch}'")
         elif choice == "7":
-            pr_number = input("Masukkan nomor PR untuk merge: ").strip()
-            if pr_number:
-                merge_type = input("Tipe merge [merge/squash/rebase, default merge]: ").strip().lower()
-                if merge_type not in ["merge", "squash", "rebase"]:
-                    merge_type = "merge"
-                run(["gh", "pr", "merge", pr_number, f"--{merge_type}", "--delete-branch", "--confirm"])
-                print(f"✅ PR #{pr_number} berhasil di-merge")
+            # Merge branch aktif ke main otomatis
+            current_branch = run_output(["git", "branch", "--show-current"])
+            if current_branch == "main":
+                print("⚠️ Kamu sedang di branch main. Tidak bisa merge main ke main.")
+                continue
+
+            # Push dulu kalau belum di-push
+            run(["git", "push", "-u", "origin", current_branch])
+            print(f"🚀 Branch '{current_branch}' dipush ke GitHub")
+
+            # Buat PR otomatis ke main
+            title = f"Merge {current_branch} ke main"
+            cmd_create_pr = ["gh", "pr", "create", "--base", "main", "--head", current_branch, "--title", title]
+            run(cmd_create_pr)
+            print(f"✅ Pull Request dibuat dari '{current_branch}' ke 'main'")
+
+            # Merge PR langsung
+            cmd_merge_pr = ["gh", "pr", "merge", current_branch, "--merge", "--delete-branch"]
+            run(cmd_merge_pr)
+            print(f"🎉 Branch '{current_branch}' berhasil di-merge ke main dan dihapus di remote")
         else:
             print("⚠️ Pilihan tidak valid")
 
