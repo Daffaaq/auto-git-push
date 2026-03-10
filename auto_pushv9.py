@@ -99,6 +99,8 @@ def git_tools_menu():
         print("3. Checkout ke branch")
         print("4. Lihat log commit")
         print("5. Kembali ke menu utama")
+        print("6. Buat Pull Request")
+        print("7. Merge Pull Request")
         choice = input("Pilih opsi: ").strip()
 
         if choice == "1":
@@ -123,12 +125,11 @@ def git_tools_menu():
                 run(["git", "checkout", checkout_branch])
                 print(f"✅ Berhasil checkout ke branch '{checkout_branch}'")
         elif choice == "4":
-            logs = run_output(["git", "log", "--oneline", "--graph", "--pretty=format:%h %ad %s", "--all"])
+            logs = run_output(["git", "log", "--oneline", "--graph", "--pretty=format:%h %ad %s", "--date=local", "--all"])
             print("\n📝 Log commit:\n", logs)
         elif choice == "5":
             break
         elif choice == "6":
-            # Buat Pull Request
             current_branch = run_output(["git", "branch", "--show-current"])
             target_branch = input("Merge ke branch (default main): ").strip()
             if not target_branch:
@@ -140,14 +141,16 @@ def git_tools_menu():
             cmd = ["gh", "pr", "create", "--base", target_branch, "--head", current_branch, "--title", title]
             if body:
                 cmd += ["--body", body]
+            cmd += ["--reviewer", ""]  # bisa lo tambahin reviewer kalau mau
             run(cmd)
             print(f"✅ Pull Request dibuat dari '{current_branch}' ke '{target_branch}'")
-            
         elif choice == "7":
-            # Merge Pull Request
             pr_number = input("Masukkan nomor PR untuk merge: ").strip()
             if pr_number:
-                run(["gh", "pr", "merge", pr_number, "--merge"])
+                merge_type = input("Tipe merge [merge/squash/rebase, default merge]: ").strip().lower()
+                if merge_type not in ["merge", "squash", "rebase"]:
+                    merge_type = "merge"
+                run(["gh", "pr", "merge", pr_number, f"--{merge_type}", "--delete-branch", "--confirm"])
                 print(f"✅ PR #{pr_number} berhasil di-merge")
         else:
             print("⚠️ Pilihan tidak valid")
@@ -177,7 +180,6 @@ def commit_push_loop(branch):
                     print("🎉 Push berhasil")
                 with open("git_auto.log", "a") as log_file:
                     log_file.write(f"{datetime.now()} | Commit: {msg} | Branch: {branch}\n")
-        # Menu tambahan
         print("\n💡 Opsi tambahan:")
         print("   [tools] buka menu Git tools, [exit] keluar")
         action = input("Pilihan: ").strip().lower()
@@ -191,7 +193,7 @@ def commit_push_loop(branch):
 # Main
 # ======================
 def main():
-    print("\n==== AUTO GIT TOOL V10 ====\n")
+    print("\n==== AUTO GIT TOOL V11 ====\n")
     check_gh()
     check_git()
     branch = check_remote()
