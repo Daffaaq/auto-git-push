@@ -111,6 +111,10 @@ def git_tools_menu():
             else:
                 run(["git", "checkout", "-b", new_branch])
                 print(f"✅ Branch '{new_branch}' dibuat dan dicheckout")
+                push_now = input("Push branch ini ke GitHub sekarang? (y/n, default y): ").strip().lower()
+                if push_now != "n":
+                    run(["git", "push", "-u", "origin", new_branch])
+                    print(f"🚀 Branch '{new_branch}' berhasil dipublish ke GitHub")
         elif choice == "3":
             checkout_branch = input("Nama branch untuk checkout: ").strip()
             if not checkout_branch:
