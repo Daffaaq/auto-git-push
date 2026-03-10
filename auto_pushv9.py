@@ -127,6 +127,28 @@ def git_tools_menu():
             print("\n📝 Log commit:\n", logs)
         elif choice == "5":
             break
+        elif choice == "6":
+            # Buat Pull Request
+            current_branch = run_output(["git", "branch", "--show-current"])
+            target_branch = input("Merge ke branch (default main): ").strip()
+            if not target_branch:
+                target_branch = "main"
+            title = input("Judul PR: ").strip()
+            if not title:
+                title = f"PR dari {current_branch}"
+            body = input("Deskripsi PR (kosong = none): ").strip()
+            cmd = ["gh", "pr", "create", "--base", target_branch, "--head", current_branch, "--title", title]
+            if body:
+                cmd += ["--body", body]
+            run(cmd)
+            print(f"✅ Pull Request dibuat dari '{current_branch}' ke '{target_branch}'")
+            
+        elif choice == "7":
+            # Merge Pull Request
+            pr_number = input("Masukkan nomor PR untuk merge: ").strip()
+            if pr_number:
+                run(["gh", "pr", "merge", pr_number, "--merge"])
+                print(f"✅ PR #{pr_number} berhasil di-merge")
         else:
             print("⚠️ Pilihan tidak valid")
 
